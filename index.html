@@ -147,6 +147,7 @@ const status = document.getElementById("status");
 fileInput.addEventListener("change", function () {
 
   const files = fileInput.files;
+  status.innerText = "";
 
   if (files.length > 0) {
 
@@ -212,6 +213,7 @@ async function uploadFiles() {
 
   selectedFiles.innerText = "";
   uploadButton.style.display = "none";
+  uploadButton.disabled = false;
   fileInput.value = "";
 
 }
