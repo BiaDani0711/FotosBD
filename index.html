@@ -103,24 +103,144 @@
       <strong>las comprometedoras también.</strong>
     </div>
 
-    <input
-      type="file"
-      id="fileInput"
-      accept="image/*,video/*"
-      multiple
-    >
+<input
+  type="file"
+  id="fileInput"
+  accept="image/*,video/*"
+  multiple
+>
 
-    <button
-      class="upload-button"
-      onclick="document.getElementById('fileInput').click()">
-      📷 Subir fotos y vídeos
-    </button>
+<button
+  class="upload-button"
+  onclick="document.getElementById('fileInput').click()">
+  📷 Seleccionar fotos y vídeos
+</button>
+
+<p id="selectedFiles"></p>
+
+<button
+  class="upload-button"
+  id="uploadButton"
+  onclick="uploadFiles()"
+  style="display:none; margin-top:15px;">
+  Subir archivos
+</button>
+
+<p id="status"></p>
 
     <div class="footer">
       Gracias por formar parte de nuestros recuerdos ♡
     </div>
 
   </div>
+
+
+ <script>
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweEjtPrfmiK4wH42lLWtLBJcn5uFChbazA4k6_uCCktKNHvhc1_1mDVapAeklZjS-u/exec";
+
+const fileInput = document.getElementById("fileInput");
+const selectedFiles = document.getElementById("selectedFiles");
+const uploadButton = document.getElementById("uploadButton");
+const status = document.getElementById("status");
+
+fileInput.addEventListener("change", function () {
+
+  const files = fileInput.files;
+
+  if (files.length > 0) {
+
+    selectedFiles.innerText =
+      files.length === 1
+        ? "1 archivo seleccionado"
+        : files.length + " archivos seleccionados";
+
+    uploadButton.style.display = "inline-block";
+
+  }
+
+});
+
+
+async function uploadFiles() {
+
+  const files = fileInput.files;
+
+  if (!files.length) return;
+
+  uploadButton.disabled = true;
+
+  for (let i = 0; i < files.length; i++) {
+
+    const file = files[i];
+
+    status.innerText =
+      "Subiendo " + (i + 1) + " de " + files.length + "...";
+
+    try {
+
+      const base64 = await fileToBase64(file);
+
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        redirect: "follow",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          mimeType: file.type,
+          data: base64
+        })
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      status.innerText =
+        "❌ Ha ocurrido un error al subir los archivos.";
+
+      uploadButton.disabled = false;
+
+      return;
+    }
+  }
+
+  status.innerText =
+    "❤️ ¡Gracias! Tus recuerdos se han guardado.";
+
+  selectedFiles.innerText = "";
+  uploadButton.style.display = "none";
+  fileInput.value = "";
+
+}
+
+
+function fileToBase64(file) {
+
+  return new Promise((resolve, reject) => {
+
+    const reader = new FileReader();
+
+    reader.onload = function () {
+
+      const base64 =
+        reader.result.split(",")[1];
+
+      resolve(base64);
+
+    };
+
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
+
+  });
+
+}
+
+</script> 
 
 </body>
 </html>
