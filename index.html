@@ -136,7 +136,6 @@
 
 
  <script>
-
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweEjtPrfmiK4wH42lLWtLBJcn5uFChbazA4k6_uCCktKNHvhc1_1mDVapAeklZjS-u/exec";
 
 const fileInput = document.getElementById("fileInput");
@@ -145,44 +144,42 @@ const uploadButton = document.getElementById("uploadButton");
 const status = document.getElementById("status");
 
 fileInput.addEventListener("change", function () {
-
   const files = fileInput.files;
+
+  // Limpiar el mensaje de la subida anterior
   status.innerText = "";
 
   if (files.length > 0) {
-
     selectedFiles.innerText =
       files.length === 1
         ? "1 archivo seleccionado"
         : files.length + " archivos seleccionados";
 
     uploadButton.style.display = "inline-block";
-
+    uploadButton.disabled = false;
+  } else {
+    selectedFiles.innerText = "";
+    uploadButton.style.display = "none";
   }
-
 });
 
-
 async function uploadFiles() {
-
   const files = fileInput.files;
 
   if (!files.length) return;
 
   uploadButton.disabled = true;
 
-  for (let i = 0; i < files.length; i++) {
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-    const file = files[i];
-
-    status.innerText =
-      "Subiendo " + (i + 1) + " de " + files.length + "...";
-
-    try {
+      status.innerText =
+        "Subiendo " + (i + 1) + " de " + files.length + "...";
 
       const base64 = await fileToBase64(file);
 
-      await fetch(SCRIPT_URL, {
+      const response = await fetch(SCRIPT_URL, {
         method: "POST",
         redirect: "follow",
         headers: {
@@ -190,59 +187,62 @@ async function uploadFiles() {
         },
         body: JSON.stringify({
           fileName: file.name,
-          mimeType: file.type,
+          mimeType: file.type || "application/octet-stream",
           data: base64
         })
       });
 
-    } catch (error) {
+      if (!response.ok) {
+        throw new Error(
+          "El servidor respondió con el código " + response.status
+        );
+      }
 
-      console.error(error);
+      const result = await response.json();
 
-      status.innerText =
-        "❌ Ha ocurrido un error al subir los archivos.";
-
-      uploadButton.disabled = false;
-
-      return;
+      if (!result.success) {
+        throw new Error(
+          result.error || "Google Drive no confirmó la subida."
+        );
+      }
     }
+
+    status.innerText =
+      "❤️ ¡Gracias! Tus recuerdos se han guardado.";
+
+    selectedFiles.innerText = "";
+    fileInput.value = "";
+    uploadButton.style.display = "none";
+
+  } catch (error) {
+    console.error("Error de subida:", error);
+
+    status.innerText =
+      "❌ No se han podido subir todos los archivos. Inténtalo de nuevo.";
+
+  } finally {
+    // Volver a habilitar el botón para otra tanda
+    uploadButton.disabled = false;
   }
-
-  status.innerText =
-    "❤️ ¡Gracias! Tus recuerdos se han guardado.";
-
-  selectedFiles.innerText = "";
-  uploadButton.style.display = "none";
-  uploadButton.disabled = false;
-  fileInput.value = "";
-
 }
 
-
 function fileToBase64(file) {
-
   return new Promise((resolve, reject) => {
-
     const reader = new FileReader();
 
     reader.onload = function () {
-
-      const base64 =
-        reader.result.split(",")[1];
-
+      const base64 = reader.result.split(",")[1];
       resolve(base64);
-
     };
 
-    reader.onerror = reject;
+    reader.onerror = function () {
+      reject(new Error("No se ha podido leer " + file.name));
+    };
 
     reader.readAsDataURL(file);
-
   });
-
 }
-
-</script> 
+</script>
 
 </body>
 </html>
