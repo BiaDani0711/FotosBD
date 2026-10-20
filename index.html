@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bianca & Daniel</title>
 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f7f3ed;
+      font-family: Georgia, "Times New Roman", serif;
+      color: #38332f;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .initials {
+      font-size: 18px;
+      letter-spacing: 5px;
+      margin-bottom: 35px;
+      color: #8a7b6c;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: normal;
+      margin: 0 0 12px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #77706a;
+      margin-bottom: 45px;
+    }
+
+    .message {
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 35px;
+    }
+
+    .upload-button {
+      display: inline-block;
+      background: #6e8062;
+      color: white;
+      padding: 18px 30px;
+      border-radius: 50px;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .upload-button:hover {
+      background: #596b50;
+    }
+
+    .footer {
+      margin-top: 45px;
+      font-size: 14px;
+      color: #989088;
+    }
+
+    #fileInput {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="initials">B & D</div>
+
+    <h1>Bianca & Daniel</h1>
+
+    <div class="subtitle">
+      Nuestro día, visto por vosotros ♡
+    </div>
+
+    <div class="message">
+      Queremos guardar todos esos momentos que nosotros
+      quizá no lleguemos a ver.<br><br>
+
+      Sube aquí tus fotos y vídeos de la boda.
+      Las bonitas, las espontáneas y, por supuesto,
+      <strong>las comprometedoras también.</strong>
+    </div>
+
+    <input
+      type="file"
+      id="fileInput"
+      accept="image/*,video/*"
+      multiple
+    >
+
+    <button
+      class="upload-button"
+      onclick="document.getElementById('fileInput').click()">
+      📷 Subir fotos y vídeos
+    </button>
+
+    <div class="footer">
+      Gracias por formar parte de nuestros recuerdos ♡
+    </div>
+
+  </div>
+
+</body>
+</html>
